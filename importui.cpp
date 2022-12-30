@@ -98,7 +98,7 @@ void ImportUI::on__import_clicked()
         return;
     QList<Product*> prds;
     for(int i=0;i<num;i+=5)
-        prds.append(&wh->prds[items[i]->row()]);
+        prds.append(&wh->prds[index[items[i]->row()]]);
     DialogImport* di=new DialogImport(prds,type);
     di->exec();
     showtable();
