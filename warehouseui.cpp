@@ -176,7 +176,7 @@ void WarehouseUI::on__revise_clicked()
 {
     int i=ui->tableWidget->currentRow();//获取表格当前选择的行号,未选则返回-1
     if(-1==i) return;
-    Product prd=wh->prds[i];
+    Product prd=wh->prds[index[i]];
     bool is=false;
     bool* ischanged=&is;
     DialogRevisePrd* drp = new DialogRevisePrd(&prd,ischanged);
@@ -184,24 +184,24 @@ void WarehouseUI::on__revise_clicked()
     if(*ischanged==false)
         return;
     QString path=QCoreApplication::applicationDirPath()+"//data//Products//__";
-    if(prd.code!=wh->prds[i].code)//如果物料编码被修改
+    if(prd.code!=wh->prds[index[i]].code)//如果物料编码被修改
     {
         //判断物料编码是否重复
-        QList<int> index=wh->searchPrd("",prd.code,"");
-        if(index.size()!=0)
+        QList<int> ind=wh->searchPrd("",prd.code,"");
+        if(ind.size()!=0)
         {
             QMessageBox::warning(this,"修改失败","物料编码与已有的信息重复！");
-            this->index=index;
+            this->index=ind;
             showtable();//显示重复的信息
             return;
         }
         //删除原文件夹
-        QDir dir(path+wh->prds[i].code);
+        QDir dir(path+wh->prds[index[i]].code);
         dir.removeRecursively();
         //新建文件夹
         addDir(prd);
         //修改成功
-        wh->prds[i]=prd;
+        wh->prds[index[i]]=prd;
         QMessageBox::about(this,"","修改成功！");
         refresh();
         return;
@@ -209,7 +209,7 @@ void WarehouseUI::on__revise_clicked()
 
     }
     //修改data文件
-    QFile file(path+wh->prds[i].code+"//data.dat");
+    QFile file(path+wh->prds[index[i]].code+"//data.dat");
     file.open(QIODeviceBase::WriteOnly);
     QTextStream fout(&file);
     QString content = prd.code+" "
@@ -220,7 +220,7 @@ void WarehouseUI::on__revise_clicked()
     fout<<content<<"\n";
     file.close();
     //修改成功
-    wh->prds[i]=prd;
+    wh->prds[index[i]]=prd;
     QMessageBox::about(this,"","修改成功！");
     refresh();
 
@@ -234,13 +234,13 @@ void WarehouseUI::on__delete_clicked()
     if(QMessageBox::Ok==QMessageBox::warning(this,"警告","请确认是否删除！删除后信息将无法找回！",QMessageBox::Ok,QMessageBox::Cancel))
     {
         QString path=QCoreApplication::applicationDirPath()+"//data//Products//__";
-        QDir dir(path+wh->prds[i].code);
+        QDir dir(path+wh->prds[index[i]].code);
         if(!dir.removeRecursively())
         {
             QMessageBox::warning(this,"错误","删除原文件夹失败！");
             return;
         }
-        wh->prds.removeAt(i);
+        wh->prds.removeAt(index[i]);
         refresh();
     }
 }
